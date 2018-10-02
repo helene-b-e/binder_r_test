@@ -1,0 +1,245 @@
+---
+title: R markdown script from going through R package *'esd'* examples from the package documentation, chapter 2
+author: "Helene B. Erlandsen"
+date: "September 4, 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+Notes and copy of R '*esd*' from the MET report no 11/15:
+**‘esd’ - The Empirical-Statistical Downscaling tool & its visualisation capabilities**, by *Rasmus E. Benestad, Abdelkader Mezghani, & Kajsa M. Parding*
+
+
+The documentation for '*esd*': (https://figshare.com/articles/_esd_The_Empirical_Statistical_Downscaling_tool_amp_its_visualisation_capabilities_/1454425) includes several examples and a [wiki](https://github.com/metno/esd/wiki)-page with instructions for downloading and installing the esd-library. 
+
+###R-studio and R-markdown-newbie-help
+Instructions and help found [here (cheat sheet)](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf), and e.g. in a Penn State Course ([link to STAT297](https://smac-group.github.io/ds/))
+
+
+After installing esd (see the wiki above) import the package functions to the workspace by typing:
+library(esd). The examples will not work until this is done.
+
+```{r}
+library(RgoogleMaps)
+library(esd)
+```
+
+
+# R '*esd*' documentation examples. Chapter 2:
+This section is about the structure of ESD in R, how ESD is built, what classes are and how they are used, and what happens when you call a function. 
+
+### Some notation too keep an eye up for
+R **packages**: ESD and clim.pact are packages in R. ESD builds on clim.pact
+
+**objects**: meta-data object: 'stationmeta'
+
+S3 is a built in R-**method**. A *data.frame* is an S3 object.
+
+**class** defines the object type ('zoo' is a unsorted-time-series-class avaliable in *esd* )
+
+In the R S3-**method**: objects do not "have" functions (e.g. fig.plot()), but ** generic functions** are called and how they are executed (the methods/messages) depend on the class of the object which is an argument to the function (e.g. summary(df['test'])). Many functions in the '*esd*'-package are inherited from the '*clim.pact*'-package. 
+
+###From the documentation:
+"*A short and single line in R produces a complex figure with various information: the generic ‘plot’ yields a plot as seen in the left panel of Figure 4 or can make a graphical presentation of downscaled results that both shows the numbers as well as their quality. How is that possible?*
+
+*The trick is to define different data object types, known as ‘classes’ in R and define a specific data reference syntax (DRS) or common information model (CIM) that includes the meta-data in the working computer memory as well as in files stored on discs. This is all done automatically on-the-fly behind the scene, so that the user does not have to worry about these matters (it is of course possible to change the meta-data to e.g. correct for potential errors). [...] It also includes an additional set of predefined objects and classes, sample and structured data and meta-data, and uses the **S3**-methods to ensure that information is appropriately maintained.*"
+
+About R <http://adv-r.had.co.nz/OO-essentials.html>"*Underlying every R object is a C structure (or struct) that describes how that object is stored in memory. The struct includes the contents of the object, the information needed for memory management, and, most importantly for this section, a type. This is the base type of an R object. Base types are not really an object system because only the R core team can create new types. As a result, new base types are added very rarely *"
+
+<http://adv-r.had.co.nz/OO-essentials.html>"*S3 is R’s first and simplest OO system. It is the only OO system used in the base and stats packages, and it’s the most commonly used system in CRAN packages. S3 is informal and ad hoc, but it has a certain elegance in its minimalism: you can’t take away any part of it and still have a useful OO system.*"
+
+More on the S3 
+<http://adv-r.had.co.nz/S3.html> : 
+
+
+```{r sec2.1.3}
+library(RgoogleMaps)
+#quick search: select a subset of stations after using the function 'select.station'. NB: this function is to provide overview of what is avaliable, the data itself may need to be downloaded
+
+n300=select.station(nmin=300, param="t2m") # meta: stations with more than 300 years of data. n300 is metadata now
+#n300 #finds Berlin-Tempel (stid: 61710384000) and De Bilt (stid: 63306260000) only
+# now use the station function to download the observational data:
+DeBilt_t2m=station(stid='63306260000') #doesn't work in markdown because of question
+#plot(DeBilt_t2m)
+class(DeBilt_t2m)
+#DeBilt_yr=annual(DeBilt_t2m, FUN = 'mean', nmin=200)# this does not work, but if I set nmin to default (help function says a complete year, I get values )
+DeBilt_yr=annual(DeBilt_t2m, FUN = 'mean')
+class(DeBilt_yr)
+plot(DeBilt_yr, new=FALSE) #why do you have to set the ylims?
+lines(trend(DeBilt_yr),col="red",lwd=2) #works sometimes in console
+
+
+```
+
+###Example 2.1 (with minor modifications)
+```{r 2.1.1, warning=FALSE}
+ss <- select.station(cntr='India',param='tmax',src='ghcnd')
+ss.new <- subset(ss,is=!duplicated(ss$location))
+```
+
+```{r 2.1.2}
+# Highlights the location on the map
+map(ss.new,cex=.7,col='red',bg='pink')
+ss <- select.station(stid='IN022021900',cntr='india',param='tmax')
+y <- station(ss)
+loc(y)
+points(lon(y),lat(y),pch=19,col='blue',cex=.7)
+```
+
+```{r 2.1.3}
+# aggregate daily values to annual values
+ya <- annual(y,FUN='mean',nmin=10) 
+# Subset for the period 1970 to 2012
+ya <- subset(ya,it=c(1970,2012))
+# plot the time series including the error bar
+plot(ya,ylim=c(29.5,32.5), new=FALSE)
+# Add the linear trend as
+lines(trend(ya),col="red",lwd=2)
+```
+
+
+
+###Example 2.2
+```{r 2.2.1}
+# Example of monthly station data:
+# from ?data: The ability to specify a dataset by name (without quotes) is a convenience: in programming the datasets should be specified by character strings (with quotes). data is an R base function implemented to easily load exampel-data from packages. Supported data-type-files end with .R, .Rdata, and .txt .csv, 
+data(Oslo)
+class(Oslo) #Oslo has class zoo, i.e. is an unstructured dataframe (or has a class which allows unstructured dataframes) it is 2-d data and and monthly
+str(Oslo) #str is not string but prints out the STRuctrure of an R-object in a compact way
+Oslo[0:10]
+# Example of daily station data:
+data(ferder)
+class(ferder)
+print('ferder')
+ferder[0:10]
+# Example of annual station data:
+class(annual(ferder))
+print('annual(ferder): ')
+annual(ferder)[0:10]
+```
+```{r 2.2.2}
+# Example of a field (3-d on ordered grid) object
+t2m <- t2m.NCEP(lon=c(-30,30),lat=c(40,70))
+class(t2m)
+t2m[0:10,0:10]
+class(EOF(t2m))
+```
+
+###Example 2.3 and 2.4
+```{r 2.3 and 2.4}
+# Load the data for Ferder weather station
+data(ferder)
+str(ferder)
+summary(ferder)
+```
+
+Data objects in '*esd*' are determined by a set of classes. 
+
+ 'station' | 'spell' | 'field' | 'eof' | 'pca' | 'cca' | 'ds'| 'dsenmseble' | 'diagnose' | 'trajectory' | 'xval' | 'xsection' | 'mvr' 
+ ------------------------------------------------------
+ |
+ 
+ 
+ '*esd*' graphics biulds on S3 plot methods, and chooses plotting method based on object class. plot(Oslo) and plot.station(Oslo) is the same function if Oslo has class '*station*'. 
+
+esd-functions are 
+
+
+ 'plot' | 'map' | 'vec'
+  ----- | ----- | ------
+
+
+*map* is not based on R-package *maps*. The default projection is lonlat, contour-plot, for events and trajectory it is sphere-projection. Aux. functions include map.googleearth(), lonlatprojection, rotM, gridbox, map2sphere, vec, mask "*Projections: c("lonlat","sphere","np","sp") - the latter gives stereographic views from the North and south poles.*"
+Different functions have different arguments. For map.eof *ip* (i(n)-pattern) is an argument. [Q.: should be limit to point zoom to not zoom to higher res than the coordinates give, and given res. of background map-data.]
+
+
+
+###Example 2.5
+```{r 2.5}
+data("bjornholt")
+plot(bjornholt, new=FALSE)
+map(bjornholt,new=FALSE)
+```
+
+###Example 2.6
+```{r 2.6}
+#Get NCEP 2m air temperature for the selected spatial window defined by lon and lat
+t2m <- t2m.NCEP(lon=c(-30,30),lat=c(40,70))
+# Computes the EOFs
+X <- EOF(t2m)
+# Plot the result
+plot(X)
+```
+
+
+
+###Example 2.7
+```{r 2.7}
+# Load 10m zonal and meridional wind components
+# check where you are:
+#getwd()
+#DO NOT HAVE FILES
+#u10 <- retrieve('esd/ESDdata/ERAINT/eraint_elnino.nc',param='u10')
+#v10 <- retrieve('esd/data/ERAINT/eraint_elnino.nc',param='v10')
+# Map the data
+#map(u10,colorbar=FALSE)
+# Display the vectors
+#vec(u10,v10,new=FALSE,a=2,length=0.05)
+```
+
+More functions in '*esd*': Infographics:
+
+Examples are the functions:
+
+ '*cumugram*' |  '*wheel*' | '*climvar*' | '*diagram*' | '*vis.trends*'
+ ------------| ---------- | ------------| -----------  | --------------
+ cumulative value | seasonal wheel | sd-variance | scatter annual overlay | trends varying length and start
+
+
+###Example 2.8
+```{r 2.8,, echo=TRUE,warning=FALSE,results='hide',fig.keep='all'}
+# Get 2m temperature data for Oslo
+# (works within MET Norway firewall only)
+x <- station(stid=18700,param='t2m',src='metnod')
+x <- subset(x,it=c(1837,2016))
+## Or gets data from ECA&D as
+## x <- station(loc="Oslo Blindern",param=’t2m’,src=’ecad’)
+x <- subset(x,is=duplicated(loc(x))) # to remove duplicated stations
+
+
+# seasonal variations of year-to-year variance
+climvar(x) #also large printout
+# daily seasonal cycle for all years
+diagram(x)
+# Cumulative average
+# helenebe: how to supress print out? verbose=FALSE does not change it 
+cumugram(x)
+# Seasonal wheel
+#wheel(x,new=TRUE) 
+```
+###Example 2.9.
+
+```{r 2.9, echo=TRUE,warning=FALSE,results='hide',fig.keep='all'}
+# Get 2m temperature data for Ferder and calculate annual mean
+data(ferder)
+x <- annual(ferder)
+# Plot the time series and add a trend line
+plot(x,ylim=c(4,11), new=FALSE)
+lines(trend(x),col="red",lwd=2)
+# Visualise trends for various periods 40 years or longer (minlen)
+# and mark trends that are significant at the 1% level (pmax)
+vis.trends(x,minlen=40,pmax=0.01, new=FALSE)
+```
+
+
+
+
+
+
