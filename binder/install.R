@@ -5,4 +5,4 @@ install.packages("zoo")
 install.packages("devtools")
 
 
-devtools::install_github("install.packages("metno/esd")
+devtools::install_github("metno/esd")
