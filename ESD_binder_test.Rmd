@@ -5,9 +5,26 @@ date: "September 4, 2017"
 output:
   html_document: default
   pdf_document: default
+jupyter:
+  jupytext_format_version: '1.0'
+  jupytext_formats: Rmd:rmarkdown
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  language_info:
+    codemirror_mode:
+      name: ipython
+      version: 3
+    file_extension: .py
+    mimetype: text/x-python
+    name: python
+    nbconvert_exporter: python
+    pygments_lexer: ipython3
+    version: 3.6.3
 ---
 
-```{r setup, include=FALSE}
+```{python setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 ```
@@ -26,8 +43,8 @@ Instructions and help found [here (cheat sheet)](https://www.rstudio.com/wp-cont
 After installing esd (see the wiki above) import the package functions to the workspace by typing:
 library(esd). The examples will not work until this is done.
 
-```{r}
-library(RgoogleMaps)
+```{python}
+
 library(esd)
 ```
 
@@ -59,7 +76,7 @@ More on the S3
 <http://adv-r.had.co.nz/S3.html> : 
 
 
-```{r sec2.1.3}
+```{python sec2.1.3}
 library(RgoogleMaps)
 #quick search: select a subset of stations after using the function 'select.station'. NB: this function is to provide overview of what is avaliable, the data itself may need to be downloaded
 
@@ -79,12 +96,12 @@ lines(trend(DeBilt_yr),col="red",lwd=2) #works sometimes in console
 ```
 
 ###Example 2.1 (with minor modifications)
-```{r 2.1.1, warning=FALSE}
+```{python ex2.1.1, warning=FALSE}
 ss <- select.station(cntr='India',param='tmax',src='ghcnd')
 ss.new <- subset(ss,is=!duplicated(ss$location))
 ```
 
-```{r 2.1.2}
+```{python ex2.1.2}
 # Highlights the location on the map
 map(ss.new,cex=.7,col='red',bg='pink')
 ss <- select.station(stid='IN022021900',cntr='india',param='tmax')
@@ -93,7 +110,7 @@ loc(y)
 points(lon(y),lat(y),pch=19,col='blue',cex=.7)
 ```
 
-```{r 2.1.3}
+```{python ex2.1.3}
 # aggregate daily values to annual values
 ya <- annual(y,FUN='mean',nmin=10) 
 # Subset for the period 1970 to 2012
@@ -105,9 +122,8 @@ lines(trend(ya),col="red",lwd=2)
 ```
 
 
-
 ###Example 2.2
-```{r 2.2.1}
+```{python ex2.2.1}
 # Example of monthly station data:
 # from ?data: The ability to specify a dataset by name (without quotes) is a convenience: in programming the datasets should be specified by character strings (with quotes). data is an R base function implemented to easily load exampel-data from packages. Supported data-type-files end with .R, .Rdata, and .txt .csv, 
 data(Oslo)
@@ -124,7 +140,7 @@ class(annual(ferder))
 print('annual(ferder): ')
 annual(ferder)[0:10]
 ```
-```{r 2.2.2}
+```{python ex2.2.2}
 # Example of a field (3-d on ordered grid) object
 t2m <- t2m.NCEP(lon=c(-30,30),lat=c(40,70))
 class(t2m)
@@ -133,7 +149,7 @@ class(EOF(t2m))
 ```
 
 ###Example 2.3 and 2.4
-```{r 2.3 and 2.4}
+```{python ex2.3_and_2.4}
 # Load the data for Ferder weather station
 data(ferder)
 str(ferder)
@@ -145,8 +161,8 @@ Data objects in '*esd*' are determined by a set of classes.
  'station' | 'spell' | 'field' | 'eof' | 'pca' | 'cca' | 'ds'| 'dsenmseble' | 'diagnose' | 'trajectory' | 'xval' | 'xsection' | 'mvr' 
  ------------------------------------------------------
  |
- 
- 
+
+
  '*esd*' graphics biulds on S3 plot methods, and chooses plotting method based on object class. plot(Oslo) and plot.station(Oslo) is the same function if Oslo has class '*station*'. 
 
 esd-functions are 
@@ -162,14 +178,14 @@ Different functions have different arguments. For map.eof *ip* (i(n)-pattern) is
 
 
 ###Example 2.5
-```{r 2.5}
+```{python ex2.5}
 data("bjornholt")
 plot(bjornholt, new=FALSE)
 map(bjornholt,new=FALSE)
 ```
 
 ###Example 2.6
-```{r 2.6}
+```{python ex2.6}
 #Get NCEP 2m air temperature for the selected spatial window defined by lon and lat
 t2m <- t2m.NCEP(lon=c(-30,30),lat=c(40,70))
 # Computes the EOFs
@@ -181,7 +197,7 @@ plot(X)
 
 
 ###Example 2.7
-```{r 2.7}
+```{python ex 2.7}
 # Load 10m zonal and meridional wind components
 # check where you are:
 #getwd()
@@ -204,7 +220,7 @@ Examples are the functions:
 
 
 ###Example 2.8
-```{r 2.8,, echo=TRUE,warning=FALSE,results='hide',fig.keep='all'}
+```{python ex2.8, echo=TRUE, warning=FALSE, results='hide', fig.keep='all'}
 # Get 2m temperature data for Oslo
 # (works within MET Norway firewall only)
 x <- station(stid=18700,param='t2m',src='metnod')
@@ -226,7 +242,7 @@ cumugram(x)
 ```
 ###Example 2.9.
 
-```{r 2.9, echo=TRUE,warning=FALSE,results='hide',fig.keep='all'}
+```{python ex2.9, echo=TRUE, warning=FALSE, results='hide', fig.keep='all'}
 # Get 2m temperature data for Ferder and calculate annual mean
 data(ferder)
 x <- annual(ferder)
