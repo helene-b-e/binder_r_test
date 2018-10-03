@@ -155,9 +155,9 @@ summary(ferder)
 
 Data objects in '*esd*' are determined by a set of classes. 
 
- 'station' | 'spell' | 'field' | 'eof' | 'pca' | 'cca' | 'ds'| 'dsenmseble' | 'diagnose' | 'trajectory' | 'xval' | 'xsection' | 'mvr' 
- ------------------------------------------------------
- |
+ 'station' | 'spell' | 'field' | 'eof' | 'pca' | 'cca' | 'ds'  | 'dsenmseble' | 'diagnose' | 'trajectory' | 'xval' | 'xsection' | 'mvr' 
+    ------ | ------  | ------  | ------| ------|------ | ------|------        | ------     | ------       |------  | ------     |------
+ 
 
 
  '*esd*' graphics biulds on S3 plot methods, and chooses plotting method based on object class. plot(Oslo) and plot.station(Oslo) is the same function if Oslo has class '*station*'. 
