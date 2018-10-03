@@ -1,5 +1,5 @@
 
-# Testing Binder for R going through some esd examples from 
+# Testing Binder for R with some esd examples
 
 
 RStudio:[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/helene-b-e/binder_r_test.git/master?urlpath=rstudio)
