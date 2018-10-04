@@ -39,11 +39,14 @@ r-2018-07-10
 requirements.txt with Jupytext is to be able to run Rmarkdown in Jupyter. For this one also  [needs](https://github.com/mwouts/jupytext/blob/master/.jupyter/jupyter_notebook_config.py) : 
 .jupytext/jupyter_notebook_config.py :
 c.NotebookApp.contents_manager_class = 'jupytext.TextFileContentsManager' 
+Remeber to open .Rmd and .ipynb and set kernel to R locally so the fiels will open with the R kernel in Jupyter as default 
 
 Afterwards copy your github repository name and add the information here:
 https://mybinder.org/#
 
 You can recieve an url-link to RStudio by choosing URL where it says "Path to a notebook file (optional)" and then writing 'rstudio': 
 https://mybinder.org/v2/gh/helene-b-e/binder_r_test.git/master?urlpath=rstudio
+
+
 
 
